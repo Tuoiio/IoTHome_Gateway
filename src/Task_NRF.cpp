@@ -87,7 +87,6 @@ extern void TaskNRF(void *pvParameter){
   
         if (myRxData[0] == 'D') // Data Relay Node Room
         {
-          
           memcpy(&Data_Relay, myRxData, sizeof(Data_Relay));
           Serial.printf("Relay 1: %d\n", Data_Relay.Relay1);
           Serial.printf("Relay 2: %d\n", Data_Relay.Relay2);

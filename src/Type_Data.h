@@ -15,4 +15,12 @@ typedef struct {
   unsigned char Relay2;
 }Data_Relay_Room_t;
 
+typedef enum {
+    NONE,
+    NETWORK_SEARCHING,
+    NETWORK_CONNECTED_POPUP,
+    NETWORK_CONNECTED,
+    NETWORK_CONNECT_FAILED
+}Network_Status_t;
+
 #endif

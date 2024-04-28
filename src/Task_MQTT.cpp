@@ -3,6 +3,7 @@
 #include <ArduinoJson.h>
 #include "Type_Data.h"
 
+
 WiFiClientSecure espClient;
 PubSubClient client(espClient);
 
@@ -18,7 +19,7 @@ static Data_Relay_Room_t Data_Relay_Reci_MQTT;
 // Sau khi mat dien tu dong gui lai thong tin
 boolean updateState = 0;
 
-void setup_wifi(void);
+
 void setup_mqtt(void);
 
 void MQTT_Reconnect(void);
@@ -26,12 +27,12 @@ void MQTT_callback(char *topic, byte *payload, unsigned int lenth);
 void MQTT_PublishMessage(const char *topic, String payload, boolean retained);
 
 
-extern void TaskWiFi(void *pvParameter){
-  setup_wifi();
+extern void TaskMQTT(void *pvParameter){
+  vTaskSuspend(NULL);
   setup_mqtt();
 
   for(;;){
-    /*********************************************Reconnect to WIFI***************************************************************/
+    /*********************************************Reconnect to MQTT***************************************************************/
     if(!client.connected()){
       static TickType_t Time_Reconnect = xTaskGetTickCount();
       if ((TickType_t)xTaskGetTickCount() - Time_Reconnect > 5000){
@@ -71,6 +72,7 @@ extern void TaskWiFi(void *pvParameter){
         MQTT_PublishMessage("ESP32/Relay", mqtt_message, true);
       }
     }
+    
     /*************************************Receive From MQTT then Update Relay************************************************/
     if(updateState == 1) {
       Serial.printf("Relay 1: %d\n", Data_Relay_Reci_MQTT.Relay1);
@@ -88,24 +90,6 @@ extern void TaskWiFi(void *pvParameter){
  }
 }
 
-void setup_wifi(void){
-  const char *ssid = "DuongTuoi";
-  const char *password = "17072002";
-
-  Serial.println();
-  Serial.print("Connecting to: ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-  while(WiFi.status() != WL_CONNECTED){
-    vTaskDelay(500);
-    Serial.print(".");
-  }
-  randomSeed(micros());
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP Address: ");
-  Serial.println(WiFi.localIP());
-}
 
 void setup_mqtt(void){
   const char *mqtt_server = "971474d396034f83b2f2e2d608193178.s1.eu.hivemq.cloud";
