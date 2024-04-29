@@ -13,10 +13,11 @@ const uint64_t Address_NodeRoom = 0x1122334411;
 uint8_t Room_On_Pipe_2 = 2;
 
 char myTxData[32];
-
-extern QueueHandle_t xQueueTemperature;
+extern QueueHandle_t xQueueRelaySendTFT;
+extern QueueHandle_t xQueueAirSendTFT;
+extern QueueHandle_t xQueueAirSendMQTT;
 extern QueueHandle_t xQueueRelaySendMQTT;
-extern QueueHandle_t xQueueRelayReceiveMQTT;
+extern QueueHandle_t xQueueRelaySendNRF;
 
 
 void setup_nrf24(void){
@@ -58,7 +59,7 @@ extern void TaskNRF(void *pvParameter){
       radio.startListening();
     }
 
-    /*********************************************NRF Receive*************************************************************/ 
+    /********************************Recive data from node then upadate mqtt and tft*************************/ 
     if(radio.available()) 
     {
       uint8_t Length_NRF = radio.getDynamicPayloadSize();
@@ -78,26 +79,26 @@ extern void TaskNRF(void *pvParameter){
         {     
           Data_Air_Node_Room_t Value_Node_Room;
           memcpy(&Value_Node_Room, myRxData, sizeof(Value_Node_Room));
-          Serial.printf("Nhiet do: %.2f\n",Value_Node_Room.temperature);
-          Serial.printf("Do am: %.2f\n",Value_Node_Room.humidity);
-          Serial.printf("CO2: %.2f\n",Value_Node_Room.CO2);
-
-          xQueueSend(xQueueTemperature, &Value_Node_Room, (TickType_t)0);
+          //Serial.printf("Nhiet do: %.2f\n",Value_Node_Room.temperature);
+          //Serial.printf("Do am: %.2f\n",Value_Node_Room.humidity);
+          //Serial.printf("CO2: %.2f\n",Value_Node_Room.CO2);
+          xQueueSend(xQueueAirSendTFT, &Value_Node_Room, (TickType_t)0);
+          xQueueSend(xQueueAirSendMQTT, &Value_Node_Room, (TickType_t)0);
         }
   
         if (myRxData[0] == 'D') // Data Relay Node Room
         {
           memcpy(&Data_Relay, myRxData, sizeof(Data_Relay));
-          Serial.printf("Relay 1: %d\n", Data_Relay.Relay1);
-          Serial.printf("Relay 2: %d\n", Data_Relay.Relay2);
-
+          //Serial.printf("Relay 1: %d\n", Data_Relay.Relay1);
+          //Serial.printf("Relay 2: %d\n", Data_Relay.Relay2);
+          xQueueSend(xQueueRelaySendTFT, &Data_Relay, (TickType_t)0);
           xQueueSend(xQueueRelaySendMQTT, &Data_Relay, (TickType_t)0);
         }
       }
       free(myRxData);
     }
     /*********************************Receive Data Relay From MQTT then upload Node Relay*****************************************/
-    if (xQueueReceive(xQueueRelayReceiveMQTT, &Data_Relay, (TickType_t)10) == pdPASS)
+    if (xQueueReceive(xQueueRelaySendNRF, &Data_Relay, (TickType_t)0) == pdPASS)
     {
       radio.stopListening();
       radio.openWritingPipe(Address_NodeRoom);

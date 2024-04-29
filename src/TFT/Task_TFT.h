@@ -49,6 +49,8 @@ static void popupMsgBox(String title, String msg);
 /*Setting Keyboard*/
 static void makeKeyboard(void);
 
+static void UI_Room(void);
+
 static void timerForNetwork(lv_timer_t *timer);
 
 static void showingFoundWiFiList(void) ;

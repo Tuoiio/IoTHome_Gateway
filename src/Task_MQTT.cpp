@@ -7,8 +7,8 @@
 WiFiClientSecure espClient;
 PubSubClient client(espClient);
 
-extern QueueHandle_t xQueueRelayReceiveMQTT;
-extern QueueHandle_t xQueueTemperature;
+extern QueueHandle_t xQueueRelaySendNRF;
+extern QueueHandle_t xQueueAirSendMQTT;
 extern QueueHandle_t xQueueRelaySendMQTT;
 extern QueueSetHandle_t xQueueReceiveNRF;
 
@@ -45,10 +45,10 @@ extern void TaskMQTT(void *pvParameter){
     
     /************************************************Publish data to coulud******************************************************/
     QueueSetMemberHandle_t Who_Unblocked = xQueueSelectFromSet(xQueueReceiveNRF, (TickType_t)10);
-    if(Who_Unblocked == xQueueTemperature)
+    if(Who_Unblocked == xQueueAirSendMQTT)
     {
       static Data_Air_Node_Room_t Data_Air_UpMQTT;
-      if(xQueueReceive(xQueueTemperature, &Data_Air_UpMQTT, (TickType_t)0) == pdPASS)
+      if(xQueueReceive(xQueueAirSendMQTT, &Data_Air_UpMQTT, (TickType_t)0) == pdPASS)
       {
         DynamicJsonDocument doc(128);
         doc["temperature"] = (float)Data_Air_UpMQTT.temperature;
@@ -84,8 +84,8 @@ extern void TaskMQTT(void *pvParameter){
       char mqtt_message[50];
       serializeJson(doc, mqtt_message);
       MQTT_PublishMessage("ESP32/Relay", mqtt_message, true);
-      updateState = 0; 
-      xQueueSend(xQueueRelayReceiveMQTT, &Data_Relay_Reci_MQTT, (TickType_t)0);
+      updateState = 0;
+      xQueueSend(xQueueRelaySendNRF, &Data_Relay_Reci_MQTT, (TickType_t)0);
     } 
  }
 }
