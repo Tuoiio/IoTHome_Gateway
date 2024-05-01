@@ -50,11 +50,11 @@ static void scanWiFiTask(void *pvParamter) {
 }
 
 void networkConnector(void) {
-  xTaskCreatePinnedToCore(beginWiFiTask, "beginWiFiTask", 8192, NULL, 3, &ntConnectTaskHandler,0);
+  xTaskCreatePinnedToCore(beginWiFiTask, "beginWiFiTask", 4096, NULL, 3, &ntConnectTaskHandler,0);
 }
 
 void networkScanner(void) {
-  xTaskCreatePinnedToCore(scanWiFiTask, "scanWiFiTask", 8192, NULL, 2, &ntScanTaskHandler,0);
+  xTaskCreatePinnedToCore(scanWiFiTask, "scanWiFiTask", 4096, NULL, 2, &ntScanTaskHandler,0);
 }
 
 static void saveWiFiCredentialEEPROM(int flag, String ssidpw) {

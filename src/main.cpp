@@ -29,9 +29,9 @@ void setup(){
   xQueueAddToSet(xQueueRelaySendMQTT, xQueueReceiveNRF);
 
   xTaskCreatePinnedToCore(TaskNRF, "Task_NRF", 4096, NULL, 2, NULL, 0);    // Core 0
-  xTaskCreatePinnedToCore(TaskTFT, "Task_TFT", 10000, NULL, 2, NULL, 1);   // Core 1
+  xTaskCreatePinnedToCore(TaskTFT, "Task_TFT", 4096, NULL, 2, NULL, 1);   // Core 1
   tryPreviousNetwork(); // Task Scan and Connect to WiFi
-  xTaskCreatePinnedToCore(TaskMQTT, "Task_MQTT", 10000, NULL, 1, &Task_MQTT_Handle, 1);  // Core 0
+  xTaskCreatePinnedToCore(TaskMQTT, "Task_MQTT", 4096, NULL, 1, &Task_MQTT_Handle, 1);  // Core 0
 }
 
 void loop() {

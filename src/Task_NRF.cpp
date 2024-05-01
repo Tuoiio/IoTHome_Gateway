@@ -35,30 +35,8 @@ void setup_nrf24(void){
 
 extern void TaskNRF(void *pvParameter){
   setup_nrf24();
-  TickType_t lastTime = xTaskGetTickCount();
   Data_Relay_Room_t Data_Relay;
   for(;;){
-    /*********************************************NRF Transimit*************************************************************/ 
-    if((TickType_t)xTaskGetTickCount() - lastTime > 500) 
-    {
-      static bool b_Node_Active = 1;
-      radio.stopListening();
-      if( b_Node_Active == 0) {   // Node Gate
-        radio.openWritingPipe(Address_NodeGate);
-        myTxData[0] = 'A';
-        radio.write(myTxData, 1);
-         
-      } else {   // Node Room
-        radio.openWritingPipe(Address_NodeRoom);
-        static uint8_t count = 0;
-        myTxData[0] = 'B';
-        radio.write(myTxData, 1);
-      }
-      b_Node_Active = !b_Node_Active;
-      lastTime = xTaskGetTickCount();
-      radio.startListening();
-    }
-
     /********************************Recive data from node then upadate mqtt and tft*************************/ 
     if(radio.available()) 
     {
@@ -79,9 +57,9 @@ extern void TaskNRF(void *pvParameter){
         {     
           Data_Air_Node_Room_t Value_Node_Room;
           memcpy(&Value_Node_Room, myRxData, sizeof(Value_Node_Room));
-          //Serial.printf("Nhiet do: %.2f\n",Value_Node_Room.temperature);
-          //Serial.printf("Do am: %.2f\n",Value_Node_Room.humidity);
-          //Serial.printf("CO2: %.2f\n",Value_Node_Room.CO2);
+          //Serial.printf("Nhiet do: %.1f\n",Value_Node_Room.temperature);
+          //Serial.printf("Do am: %.1f\n",Value_Node_Room.humidity);
+          //Serial.printf("CO2: %.1f\n",Value_Node_Room.CO2);
           xQueueSend(xQueueAirSendTFT, &Value_Node_Room, (TickType_t)0);
           xQueueSend(xQueueAirSendMQTT, &Value_Node_Room, (TickType_t)0);
         }

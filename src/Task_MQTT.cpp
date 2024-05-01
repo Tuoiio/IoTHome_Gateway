@@ -51,9 +51,17 @@ extern void TaskMQTT(void *pvParameter){
       if(xQueueReceive(xQueueAirSendMQTT, &Data_Air_UpMQTT, (TickType_t)0) == pdPASS)
       {
         DynamicJsonDocument doc(128);
-        doc["temperature"] = (float)Data_Air_UpMQTT.temperature;
-        doc["humidity"] = (float)Data_Air_UpMQTT.humidity;
-        char mqtt_message[50];
+        char mqtt_message[128];
+        if (Data_Air_UpMQTT.temperature == -88.0f) {
+          doc["teperature"] = "Sensor Error";
+          doc["humidity"] = "Sensor Error";
+        } else if (Data_Air_UpMQTT.temperature == -99.0f) {
+          doc["temperature"] = "Disconect";
+          doc["humidity"] = "Disconect";
+        } else {
+          doc["temperature"] = (float)Data_Air_UpMQTT.temperature;
+          doc["humidity"] = (float)Data_Air_UpMQTT.humidity;
+        }
         serializeJson(doc, mqtt_message);
         MQTT_PublishMessage("ESP32/Air", mqtt_message, true);
       }
