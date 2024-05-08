@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "vector": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "D:/VisualStudioCode/Platform_IO/IoT_Home_GateWay/.pio/libdeps/esp32doit-devkit-v1/ArduinoJson/src"
 }

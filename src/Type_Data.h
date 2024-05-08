@@ -1,6 +1,7 @@
 #ifndef TYPE_DATA_H_
 #define TYPE_DATA_H_
 
+
 typedef struct {
   char ID;
   float temperature;
@@ -14,6 +15,13 @@ typedef struct {
   unsigned char Relay1;
   unsigned char Relay2;
 }Data_Relay_Room_t;
+
+typedef struct {
+  char ID;
+  unsigned char Status;
+  unsigned char count;
+}Data_GateHouse_Node_t;
+
 
 typedef enum {
     NONE,
